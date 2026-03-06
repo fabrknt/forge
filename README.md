@@ -1,393 +1,166 @@
-# FABRKNT: Get Personalized DeFi Allocations
+# Forge
 
-**Get your personalized Solana yield allocation in 30 seconds.**
+Personalized Solana DeFi allocations — powered by the Fabrknt infrastructure suite.
 
-**Domain:** [www.fabrknt.com](https://www.fabrknt.com)
+**Get your personalized yield allocation in 30 seconds, executed safely with full compliance and privacy.**
 
----
+## What is Forge?
 
-## What is FABRKNT?
+Forge is Fabrknt's flagship DeFi app and the reference implementation for the entire product suite. It gives users personalized Solana yield allocations based on risk tolerance, then uses Fabrknt's own SDKs for compliance screening, identity verification, transaction security, private execution, and verifiable allocation proofs.
 
-FABRKNT gives you **personalized DeFi allocations** for **Solana**. Tell us your investment amount and risk tolerance, and we'll show you exactly where to put your money—then track it risk-free before committing real capital.
+**Try → Track → Trust → Trade**
 
-**Our philosophy:** Actionable recommendations over data dumps. Trust before trade.
+| Step | What Happens | Powered By |
+|------|-------------|------------|
+| **Try** | Get personalized allocation in 30 seconds | AI + Complr screening |
+| **Track** | Paper Portfolio Dashboard monitors performance | Stratum proofs |
+| **Trust** | 14+ days of tracking builds confidence | Veil encrypted history |
+| **Trade** | Execute with guard rails and MEV protection | Sentinel + Accredit |
 
----
+## Fabrknt SDK Integrations
 
-## Try → Track → Trust → Trade
+Forge dogfoods all 5 Fabrknt products. Each integration lives in `src/lib/fabrknt/` and is exposed via `/api/fabrknt/*` endpoints.
 
-| Step | What Happens |
-|------|--------------|
-| **Try** | Get personalized allocation in 30 seconds |
-| **Track** | Paper Portfolio Dashboard shows performance over time |
-| **Trust** | 14+ days of tracking builds confidence |
-| **Trade** | Execute with step-by-step instructions when ready |
+| Product | SDK | Integration | What it does in Forge |
+|---------|-----|-------------|----------------------|
+| **Sentinel** | `@sentinel/core` | `sentinel.ts` | Guard validates transactions before execution. DCA/rebalance/grid pattern builders drive the Trade step. Jito tips provide MEV-protected execution. |
+| **Complr** | `@complr` | `compliance.ts` | Screens wallets during onboarding. Checks pools against regulatory lists before recommending. Generates compliance alerts for allocated positions. |
+| **Accredit** | `@accredit` | `identity.ts` | Verifies KYC level from on-chain PDAs. Gates features by verification tier. Blacklist screening before transactions. |
+| **Veil** | `@veil/crypto` | `privacy.ts` | Encrypts user allocation data at rest. Shamir secret sharing for M&A data room access. Private allocation sharing without revealing identity. |
+| **Stratum** | `@stratum/core` | `data.ts` | Merkle tree proofs for verifiable allocation history. Bitfield tracking for efficient pool state management. |
 
-This is the recommended path for new users. Test strategies without risking real money, then invest when confident.
+### Integration Architecture
 
----
+```
+User Request
+    │
+    ├── /api/curate/ai/recommendations
+    │       ├── AI yield advisor (Claude)
+    │       └── @complr: screen pools before recommending
+    │
+    ├── /api/fabrknt/guard
+    │       └── @sentinel: validate transaction security (8 patterns)
+    │
+    ├── /api/fabrknt/dca
+    │       └── @sentinel: build DCA schedule for gradual entry
+    │
+    ├── /api/fabrknt/rebalance
+    │       ├── @sentinel: generate concrete rebalance trades
+    │       └── @complr: screen trades for compliance
+    │
+    ├── /api/fabrknt/screen-wallet
+    │       └── @complr: sanctions/risk screening
+    │
+    ├── /api/fabrknt/verify-identity
+    │       └── @accredit: KYC level + feature gating
+    │
+    └── /api/fabrknt/tip
+            └── @sentinel: Jito tip for MEV protection
+```
 
-## Quick Start (30 Seconds)
+### Rebalance Detector
 
-1. **Enter your preferences** — Investment amount and risk tolerance (Safe/Balanced/Growth)
-2. **Get your allocation** — Personalized recommendations with expected yields
-3. **Paper trade or execute** — Track in Paper Portfolio Dashboard, or invest right away
+The rebalance detector (`src/lib/curate/rebalance-detector.ts`) combines Forge's own APY/risk monitoring with:
 
-[Get Started →](https://www.fabrknt.com/?tab=start)
-
----
-
-## Navigation
-
-The app is organized into five connected tabs:
-
-| Tab | Purpose | What You'll Find |
-|-----|---------|------------------|
-| **Get Started** | "Your allocation in 30 seconds" | Quick start flow with personalized recommendations + Paper Portfolio Dashboard |
-| **Insights** | "Understand why" | Rebalance alerts, market context, curator strategies, performance tracking |
-| **Explore** | "Find alternatives" | Browse pools, swap out positions from your allocation |
-| **Practice** | "Build your own" | Strategy Builder pre-filled with your allocation, scenario testing |
-| **Compare** | "Analyze options" | Allocation comparison vs curators, protocol/LST tools, IL calculator |
-
-**Connected Experience:** Your allocation persists across all tabs. See your pools highlighted in Explore, compare to curators in Compare, or load it into the Strategy Builder to customize.
-
-**Mobile:** Bottom tab navigation with hamburger menu for site links.
-
----
+- **@complr** `checkAllocationCompliance()` — flags unverified protocols and concentration risk
+- **@sentinel** `buildRebalancePlan()` — generates actionable trade lists when rebalancing is needed
 
 ## Core Features
 
-### Get Started Tab (Primary Flow)
+### Get Started
+- Enter investment amount and risk tolerance (Preserver → Maximizer)
+- Get personalized pool recommendations with expected yields
+- Paper Portfolio Dashboard tracks performance over time
 
-The fastest way to get a DeFi allocation:
+### Insights
+- Rebalance alerts with compliance screening
+- Curator strategies (Gauntlet, Steakhouse, RE7)
+- Six curation principles for yield selection
 
-#### Step 1: Your Preferences
-- Enter investment amount ($100 to any amount)
-- Select risk tolerance:
-  - **Safe** (4-7% APY) — Stablecoin-heavy, minimal risk
-  - **Balanced** (7-12% APY) — Mix of stable and growth
-  - **Growth** (12-25%+ APY) — Higher risk, higher potential
+### Explore
+- Browse pools with filtering by protocol, risk, TVL
+- APY change alerts and watchlists
+- Pool comparison and historical backtesting
 
-#### Step 2: Your Allocation
-- Personalized pool recommendations
-- Expected APY and annual yield
-- Risk breakdown and warnings
-- "Why this allocation" insights
+### Practice
+- Strategy Builder with A-F grading
+- Scenario Simulator (crash, correction, bull run, depeg)
+- Import your allocation with one click
 
-#### Step 3: Execute
-- Step-by-step instructions for each position
-- Direct links to protocols (Kamino, Marginfi, Meteora, etc.)
-- Copy-paste amounts
-- Progress tracking (mark steps completed)
+### Compare
+- Your allocation vs professional curators
+- Protocol/LST comparison tools
+- Yield spreads and IL calculator
 
-#### Paper Portfolio Dashboard
-After getting your allocation, you'll see the Paper Portfolio Dashboard:
-- **Paper Value** — Total amount being tracked
-- **Estimated Yield** — Expected earnings to date
-- **Average APY** — Weighted APY across all positions
-- **Trust Progress** — 14-day ring showing progress toward building trust
-- **APY Sparklines** — Visual trend indicators (rising, falling, stable)
+## API Endpoints
 
-Your allocation auto-saves to Paper Portfolio. Track for 14+ days to build trust, then execute when confident.
+### Fabrknt Integration (`/api/fabrknt/*`)
 
-### Connected Tabs Experience
+| Endpoint | Method | SDK | Description |
+|----------|--------|-----|-------------|
+| `/api/fabrknt` | GET | — | Integration status dashboard |
+| `/api/fabrknt/guard` | POST | Sentinel | Validate transaction for 8 security patterns |
+| `/api/fabrknt/dca` | POST | Sentinel | Build DCA execution schedule |
+| `/api/fabrknt/rebalance` | POST | Sentinel + Complr | Generate rebalance trades with compliance check |
+| `/api/fabrknt/tip` | GET | Sentinel | Jito tip account for MEV protection |
+| `/api/fabrknt/screen-wallet` | POST | Complr | Wallet sanctions/risk screening |
+| `/api/fabrknt/verify-identity` | POST | Accredit | KYC verification + feature access check |
 
-Once you have an allocation, all tabs work together:
+### Curate (`/api/curate/*`)
 
-| Feature | Where | Description |
-|---------|-------|-------------|
-| **Paper Portfolio Dashboard** | Get Started | Visual performance tracking with APY trends, yield estimates, trust progress |
-| **Allocation Banner** | Insights, Explore, Practice, Compare | Summary bar showing your allocation with "View allocation" link |
-| **Your Allocation vs Curator** | Compare | Side-by-side comparison with matching curator (by risk profile) |
-| **"In your allocation" Badge** | Explore | Pools in your allocation are highlighted in the pool table |
-| **Load My Allocation** | Practice | One-click import into Strategy Builder for customization |
-| **Back to Allocation Button** | All tabs (except Start) | Floating button for quick navigation back to your allocation |
-
-This connected experience lets you:
-- **Track**: Monitor paper portfolio performance with visual dashboard
-- **Validate**: See how your allocation compares to professionals
-- **Customize**: Swap pools in Explore, see alternatives
-- **Learn**: Understand why curators make similar or different choices
-- **Iterate**: Refine your strategy in the Builder with real-time feedback
-
-### Insights Tab
-
-#### Your Allocation vs Curator
-If you have an allocation from Get Started:
-- Side-by-side comparison with a curator matching your risk profile
-- See expected APY and risk level differences
-- Understand how your choices compare to professionals
-
-#### Curation Principles
-Six mental models that guide professional curators:
-- **Risk/Reward Balance** — Higher yield = higher risk, always
-- **Diversification** — Spread risk across protocols and assets
-- **Yield Sustainability** — Base APY vs temporary emissions
-- **Protocol Trust** — TVL, audits, track record
-- **Liquidity Depth** — Can you exit without slippage?
-- **Correlation** — Understand how positions move together
-
-Click any principle to see a detailed explanation with examples.
-
-#### Curator Strategies
-Learn from professional DeFi curators:
-- **Gauntlet**, **Steakhouse Financial**, **RE7 Labs** profiles
-- Each allocation shows **why this asset** and **why this percentage**
-- Principle badges show which mental models each curator applies
-- Historical performance metrics (return, max drawdown, Sharpe ratio)
-
-### Explore Tab
-
-#### Explore Hero
-Overview of available pools with key stats (total pools, low-risk count). Messaging changes based on whether you have an allocation: "Customize or find alternatives."
-
-#### Pool Table
-Comprehensive pool listing with intelligent defaults:
-- Filter by protocol, risk level, TVL
-- Sort by TVL, APY, risk score
-- APY change alerts (badges when APY drops 20%+ or rises 30%+)
-- **"In your allocation" badge** — Pools from your allocation are highlighted
-- Watchlist for tracking favorites
-
-#### Pool Comparison & Backtesting
-Compare up to 3 pools side-by-side:
-- Risk breakdown comparison
-- APY sustainability analysis
-- **Historical performance backtesting** (7/30/90 days)
-- Compounding options (daily, weekly, none)
-
-### Practice Tab
-
-Build and test your own allocation strategies:
-
-- **Strategy Builder** — Build your own allocation strategy
-  - **"Load my allocation"** — Import your Get Started allocation with one click
-  - Select from available pools
-  - Set allocation percentages
-  - Get real-time feedback and grading (A-F)
-  - Compare your strategy to professional curators
-  - **Scenario Simulator** — Stress test with market scenarios:
-    - Market crash (-30%)
-    - Mild correction (-15%)
-    - Bull run (+50%)
-    - Rewards ending
-    - Stablecoin depeg
-
-### Compare Tab
-
-Analyze and compare allocations with specialized tools:
-
-- **Allocation Comparison** — Compare your allocation vs professional curators
-  - Side-by-side view with Gauntlet, Steakhouse, RE7
-  - See where you diverge from pros
-  - Understand curator reasoning
-
-- **Compare Tools** — Card-based tool picker:
-  - **Protocol Comparison** — Compare Kamino, Marginfi, Meteora, etc.
-  - **LST Comparison** — Compare liquid staking tokens
-  - **Yield Spreads** — Find arbitrage opportunities
-  - **Alternative Yields** — Restaking, perp LP, advanced strategies
-  - **IL Calculator** — Impermanent loss estimation
-
-### How It Works Page
-
-Comprehensive guide covering all features with direct links:
-- Learning Flow (4-step progression)
-- 6 Curation Principles explained
-- Curator Strategies overview
-- Strategy Builder & Scenario Simulator
-- Pool Comparison & Backtest
-- Compare Tools (Protocol, LST, Yield Spreads, Alternative Yields, IL Calculator)
-- AI Features (Portfolio Optimizer, AI Insights)
-- Watchlist functionality
-- Data Pipeline & Risk Scoring methodology
-- Trust & Security principles
-
----
-
-## Learning Flow (Optional)
-
-For users who want to go deeper:
-
-1. **Study curator strategies** — See how Gauntlet, Steakhouse, RE7 allocate in Insights
-2. **Practice building** — Create your own strategy in Strategy Builder with A-F grading
-3. **Compare vs pros** — See how your allocation differs from professionals
-4. **Test before deploying** — Run scenarios to stress test your strategy
-
----
-
-## AI-Powered Features
-
-### Smart Risk Insights
-AI-generated analysis in plain English (requires login):
-- Risk explanation and breakdown
-- APY sustainability analysis
-- Comparison vs. similar pools
-- Actionable verdict
-
-### Portfolio Optimizer
-AI suggests optimal allocation (requires login):
-- Input total amount and risk tolerance
-- Get diversified portfolio suggestions
-- View expected yields and risk warnings
-
----
-
-## Risk Scoring
-
-Our composite risk score (0-100) evaluates:
-
-| Factor | Weight | Description |
-|--------|--------|-------------|
-| TVL Risk | 25% | Liquidity depth and exit-ability |
-| APY Sustainability | 25% | Historical volatility and trends |
-| IL Risk | 20% | Impermanent loss exposure for LPs |
-| Stablecoin Exposure | 15% | Stability of underlying assets |
-| Protocol Maturity | 15% | Age, audits, track record |
-
-**Risk Levels:**
-- **Low** (0-20): Conservative, stable yields
-- **Medium** (21-40): Balanced risk-reward
-- **High** (41+): Higher risk, potentially higher returns
-
----
-
-## Trust & Security
-
-| Principle | Description |
-|-----------|-------------|
-| **Read-Only** | We never request wallet permissions |
-| **Non-Custodial** | Your keys, your funds. We never touch assets |
-| **Transparent** | Our methodology is open. See [Guide](/guide) |
-
-Trust badges are displayed at the top of every section throughout the app, so users always know FABRKNT is safe to use.
-
----
-
-## Pages
-
-- **/** — Main app with Get Started, Insights, Explore, Practice, and Compare tabs
-- **/guide** — Complete feature guide with links to each function
-- **/about** — Team and mission
-- **/tools** — Redirects to Compare tab
-
-### URL Navigation
-
-Direct links to specific tabs and features:
-- `/?tab=start` — Get Started (personalized allocation flow + Paper Portfolio Dashboard)
-- `/?tab=insights` — Insights tab (market context, curator strategies, performance tracking)
-- `/?tab=explore` — Explore tab (pool browser)
-- `/?tab=practice` — Practice tab (Strategy Builder)
-- `/?tab=compare` — Compare tab (Allocation Comparison + Tools)
-
----
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/curate/defi` | GET | Yield pools with risk scoring |
+| `/api/curate/defi/history/{poolId}` | GET | Historical APY data |
+| `/api/curate/protocols` | GET | Protocol comparison |
+| `/api/curate/spreads` | GET | Yield spread opportunities |
+| `/api/curate/curators` | GET | Curator profiles |
+| `/api/curate/curators/{slug}` | GET | Curator strategies |
+| `/api/curate/backtest` | POST | Historical performance backtesting |
+| `/api/curate/ai/recommendations` | POST | AI recommendations (with @complr screening) |
+| `/api/curate/ai/insights/{poolId}` | GET | AI pool analysis |
+| `/api/curate/ai/portfolio` | POST | Portfolio optimization |
 
 ## Tech Stack
 
 - **Frontend:** Next.js 16, React 19, Tailwind CSS
 - **AI:** Anthropic Claude API
-- **Database:** PostgreSQL (Supabase)
+- **Database:** PostgreSQL (Supabase) via Prisma
 - **Hosting:** Vercel
-- **Data Sources:** DeFiLlama APIs, on-chain data
+- **Data Sources:** DeFiLlama, Fragmetric, Jupiter, on-chain data
+- **Fabrknt SDKs:** Sentinel, Complr, Accredit, Veil, Stratum
 
----
-
-## Getting Started
-
-### For Users
-
-**Option A: Paper Trade First (Recommended)**
-1. Go to [fabrknt.com](https://www.fabrknt.com)
-2. Enter your investment amount and risk tolerance
-3. Get personalized allocation (30 seconds)
-4. Track with Paper Portfolio Dashboard for 14+ days
-5. Build trust by watching performance
-6. Execute with step-by-step instructions when confident
-
-**Option B: Learn to Curate (Go Deeper)**
-1. Study curator strategies in the Insights tab
-2. Practice building your own in Strategy Builder (Practice tab)
-3. Compare your allocation vs professionals (Compare tab)
-4. Test with Scenario Simulator before deploying
-5. Sign in for AI-powered recommendations
-
-### Development
+## Development
 
 ```bash
-# Install dependencies
 pnpm install
-
-# Set up environment variables
 cp .env.example .env.local
-# Add your ANTHROPIC_API_KEY, DATABASE_URL, etc.
-
-# Run development server
-pnpm dev
-
-# Type check
+pnpm dev        # http://localhost:3000
 pnpm type-check
-
-# Build for production
 pnpm build
 ```
 
 ### Environment Variables
 
 ```env
-# Database
 DATABASE_URL=postgresql://...
-
-# Authentication
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-secret
-
-# AI
 ANTHROPIC_API_KEY=sk-ant-...
-
-# App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
----
+## Fabrknt Product Suite
 
-## API Endpoints
+| Product | Slug | Repo | Scope |
+|---------|------|------|-------|
+| On-Chain Compliance | fabrknt-onchain-compliance | accredit | KYC/AML, identity, transfer hooks |
+| Off-Chain Compliance | fabrknt-offchain-compliance | complr | Screening, SAR/STR, regulatory queries |
+| Data Optimization | fabrknt-data-optimization | stratum | Merkle trees, bitfields, order matching |
+| Privacy | fabrknt-privacy | veil | Encryption, Shamir, ZK compression |
+| DeFi Toolkit | fabrknt-defi-toolkit | sentinel | Guard, patterns, Jito bundles |
+| **Forge** | — | **forge** | **Reference app dogfooding all 5 products** |
 
-### Public Endpoints
+## License
 
-- `GET /api/curate/defi` — Yield pools with risk scoring
-- `GET /api/curate/defi/history/{poolId}` — Historical APY data
-- `GET /api/curate/protocols` — Protocol aggregation and comparison
-- `GET /api/curate/spreads` — Yield spread opportunities
-- `GET /api/curate/curators` — Curator profiles
-- `GET /api/curate/curators/{slug}` — Curator strategies and insights
-- `POST /api/curate/backtest` — Historical performance backtesting
-
-### Authenticated Endpoints
-
-- `GET /api/curate/ai/preferences` — Get user preferences
-- `PUT /api/curate/ai/preferences` — Update preferences
-- `POST /api/curate/ai/recommendations` — Get AI recommendations
-- `GET /api/curate/ai/insights/{poolId}` — Get AI pool insights
-- `POST /api/curate/ai/portfolio` — Optimize portfolio
-
----
-
-## Team
-
-**Hiroyuki Saito** — Founder
-Banking & enterprise software background. AWS certified, Stanford blockchain certification. Building at the intersection of institutional finance and DeFi. Based in Tokyo.
-
-- X (Twitter): [@psyto](https://x.com/psyto)
-- LinkedIn: [hiroyuki-saito](https://www.linkedin.com/in/hiroyuki-saito/)
-
----
-
-## Contact & Resources
-
-- **Website:** [www.fabrknt.com](https://www.fabrknt.com)
-- **GitHub:** [github.com/fabrknt](https://github.com/fabrknt)
-- **X (Twitter):** [@fabrknt](https://x.com/fabrknt)
-
----
-
-**Learn how top curators think. Build strategies with confidence.**
+MIT

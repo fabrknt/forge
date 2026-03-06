@@ -12,6 +12,13 @@ Fabrknt provides blockchain compliance and privacy infrastructure as a service, 
 | Fabrknt Off-Chain Compliance | fabrknt-offchain-compliance | complr | AI-powered regulatory queries, transaction checks, SAR/STR reporting, address screening |
 | Fabrknt Data Optimization | fabrknt-data-optimization | stratum | Merkle trees, bitfields for multi-chain state optimization |
 | Fabrknt Privacy | fabrknt-privacy | veil | NaCl encryption, Shamir secret sharing, encrypted orders, ZK compression |
+| Fabrknt DeFi Toolkit | fabrknt-defi-toolkit | sentinel | Transaction guard (8 patterns), execution patterns (DCA, rebalance, grid), Jito bundle management |
+
+### Reference Application
+
+| App | Repo | Purpose |
+|-----|------|---------|
+| Forge | forge | Flagship DeFi yield allocation app, dogfoods all 5 products above |
 
 ### Founder Profile
 
@@ -78,7 +85,7 @@ Keep SBI R3 job. No risk yet.
 - Attend Token2049 Singapore or similar events for in-person meetings
 
 **Product validation:**
-- Deploy all 4 QN add-ons to QuickNode Marketplace (submission process)
+- Deploy all 5 QN add-ons to QuickNode Marketplace (submission process)
 - Track free-tier usage to gauge organic demand
 - Set up landing page at fabrknt.com — explain product suite, collect waitlist emails
 
@@ -102,7 +109,7 @@ Keep SBI R3 job. No risk yet.
 - Important for tax, fundraising, and credibility
 
 **QuickNode Marketplace go-live:**
-- Submit all 4 add-ons for QN review
+- Submit all 5 add-ons for QN review
 - Publisher entity = Fabrknt Pte. Ltd.
 - Target: live on marketplace by end of Month 5
 
@@ -212,7 +219,7 @@ Still employed at SBI R3. Building on the side. Singapore company is operational
 ## Month 1 Action Items
 
 1. Register fabrknt.com domain
-2. Submit 4 add-ons to QuickNode Marketplace
+2. Submit 5 add-ons to QuickNode Marketplace
 3. List 20 target DeFi protocols in APAC
 4. Send 10 outreach messages this week
 5. Talk to wife about the plan and timeline
