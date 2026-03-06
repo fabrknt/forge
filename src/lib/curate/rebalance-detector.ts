@@ -1,10 +1,16 @@
 /**
  * Rebalance Detector
  * Detects conditions that suggest a user should rebalance their allocation
+ *
+ * Integrates:
+ * - @sentinel: buildRebalancePlan() for actionable rebalance trade lists
+ * - @complr: checkAllocationCompliance() for regulatory screening
  */
 
 import { RiskTolerance } from "@/components/curate/quick-start";
 import { RecommendedAllocation, AllocationRecommendation } from "@/components/curate/recommendation-display";
+import { sentinel } from "@/lib/fabrknt/sentinel";
+import { compliance } from "@/lib/fabrknt/compliance";
 
 // Alert severity levels
 export type AlertSeverity = "info" | "warning" | "critical";
@@ -496,6 +502,32 @@ export function analyzeForRebalance(
     allAlerts.push(...checkBetterAlternatives(allocations, riskTolerance));
     allAlerts.push(...checkProtocolIssues(allocations));
 
+    // --- @complr: screen allocations for compliance issues ---
+    const complianceAlerts = compliance.checkAllocationCompliance(
+        allocations.map(a => ({
+            protocol: a.protocol,
+            poolId: a.poolId,
+            percentage: a.allocation,
+        }))
+    );
+    for (const ca of complianceAlerts) {
+        allAlerts.push({
+            id: generateAlertId(),
+            type: "protocol_issue",
+            severity: ca.severity === "critical" ? "critical" : ca.severity === "warning" ? "warning" : "info",
+            poolId: ca.poolId,
+            poolName: allocations.find(a => a.poolId === ca.poolId)?.poolName ?? ca.poolId,
+            protocol: ca.protocol,
+            title: `Compliance: ${ca.type.replace(/_/g, " ")}`,
+            message: ca.message,
+            action: ca.recommendation,
+            impact: {
+                currentValue: allocations.find(a => a.poolId === ca.poolId)?.allocation ?? 0,
+            },
+            createdAt: new Date(),
+        });
+    }
+
     const severityOrder: Record<AlertSeverity, number> = {
         critical: 0,
         warning: 1,
@@ -529,6 +561,35 @@ export function analyzeForRebalance(
         summary,
         lastChecked: new Date(),
     };
+}
+
+/**
+ * Generate a Sentinel rebalance plan with concrete trades.
+ * Called when the user decides to act on rebalance alerts.
+ *
+ * @sentinel: buildRebalancePlan()
+ */
+export function generateRebalancePlan(
+    allocations: RecommendedAllocation[],
+    investmentAmount: number,
+    targetAllocations: Record<string, number>
+) {
+    const currentHoldings: Record<string, { value: number; amount: number }> = {};
+    for (const alloc of allocations) {
+        const value = (alloc.allocation / 100) * investmentAmount;
+        currentHoldings[alloc.poolId] = { value, amount: value };
+    }
+
+    const targets: Record<string, { percentage: number }> = {};
+    for (const [poolId, pct] of Object.entries(targetAllocations)) {
+        targets[poolId] = { percentage: pct };
+    }
+
+    return sentinel.buildRebalancePlan({
+        targetAllocations: targets,
+        currentHoldings,
+        rebalanceThreshold: 5,
+    });
 }
 
 export function getCurrentPoolData(poolId: string): CurrentPoolData | undefined {

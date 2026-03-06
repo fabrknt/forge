@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getYieldAdvisor } from "@/lib/ai/yield-advisor";
 import { UserPreferences } from "@/lib/ai/types";
 import { fetchAllPoolsForAI } from "@/lib/curate/fetch-pools";
+import { compliance } from "@/lib/fabrknt/compliance";
 
 export async function POST(request: Request) {
     try {
@@ -45,9 +46,19 @@ export async function POST(request: Request) {
             };
         }).filter(rec => rec.pool !== null);
 
+        // @complr: screen recommended pools for compliance
+        const complianceAlerts = compliance.checkAllocationCompliance(
+            enrichedRecommendations.map(rec => ({
+                protocol: rec.pool?.protocol || "unknown",
+                poolId: rec.poolId,
+                percentage: rec.allocationPercentage ?? 0,
+            }))
+        );
+
         return NextResponse.json({
             recommendations: enrichedRecommendations,
             preferenceSummary: result.preferenceSummary,
+            complianceAlerts: complianceAlerts.length > 0 ? complianceAlerts : undefined,
             generatedAt: new Date().toISOString(),
         });
     } catch (error) {
