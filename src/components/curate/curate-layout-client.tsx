@@ -5,11 +5,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/logo";
 import { useSession, signOut } from "next-auth/react";
-import { LogIn, LogOut, Github, Menu, X, HelpCircle, Info } from "lucide-react";
+import { LogIn, LogOut, Github, Menu, X, HelpCircle, Info, ExternalLink, BarChart3, Package } from "lucide-react";
 
 const NAV_LINKS = [
     { href: "/guide", label: "Guide", icon: HelpCircle, matchPaths: ["/guide"] },
     { href: "/about", label: "About", icon: Info, matchPaths: ["/about"] },
+];
+
+const EXTERNAL_NAV = [
+    { href: "https://fabrknt.com", label: "Scorecard", icon: BarChart3 },
+    { href: "https://fabrknt.com/products", label: "Products", icon: Package },
 ];
 
 export function CurateLayoutClient({
@@ -55,6 +60,19 @@ export function CurateLayoutClient({
                                     >
                                         {link.label}
                                     </Link>
+                                ))}
+                                <div className="h-4 w-px bg-border mx-1" />
+                                {EXTERNAL_NAV.map((link) => (
+                                    <a
+                                        key={link.href}
+                                        href={link.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                                    >
+                                        {link.label}
+                                        <ExternalLink className="h-3 w-3" />
+                                    </a>
                                 ))}
                             </nav>
                         </div>
@@ -167,6 +185,33 @@ export function CurateLayoutClient({
                                 );
                             })}
                         </nav>
+
+                        {/* Divider */}
+                        <div className="mx-4 border-t border-border" />
+
+                        {/* Fabrknt Links */}
+                        <div className="p-4 space-y-1">
+                            <p className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                Fabrknt
+                            </p>
+                            {EXTERNAL_NAV.map((link) => {
+                                const Icon = link.icon;
+                                return (
+                                    <a
+                                        key={link.href}
+                                        href={link.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={() => setMenuOpen(false)}
+                                        className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                                    >
+                                        <Icon className="h-5 w-5" />
+                                        {link.label}
+                                        <ExternalLink className="h-3 w-3 ml-auto" />
+                                    </a>
+                                );
+                            })}
+                        </div>
 
                         {/* Divider */}
                         <div className="mx-4 border-t border-border" />
