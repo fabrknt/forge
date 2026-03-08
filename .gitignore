@@ -66,6 +66,9 @@ amplify/
 *.tmp
 .cache/
 
+# Demo recordings
+*.webm
+
 # Fetched company intelligence data
 data/
 
