@@ -33,11 +33,11 @@
         "@morpho-org/blue-sdk": "^5.17.0",
         "@morpho-org/blue-sdk-viem": "^4.5.0",
         "@morpho-org/morpho-ts": "^2.5.0",
-        "@nivo/bar": "^0.84.0",
-        "@nivo/core": "^0.84.0",
-        "@nivo/line": "^0.84.0",
-        "@prisma/adapter-pg": "^7.4.2",
-        "@prisma/client": "^7.4.2",
+        "@nivo/bar": "^0.99.0",
+        "@nivo/core": "^0.99.0",
+        "@nivo/line": "^0.99.0",
+        "@prisma/adapter-pg": "^7.5.0",
+        "@prisma/client": "^7.5.0",
         "@radix-ui/react-avatar": "^1.1.11",
         "@radix-ui/react-dialog": "^1.1.15",
         "@radix-ui/react-dropdown-menu": "^2.1.16",
@@ -64,7 +64,7 @@
         "decimal.js": "^10.6.0",
         "framer-motion": "^12.35.2",
         "lucide-react": "^0.309.0",
-        "next": "16.1.1",
+        "next": "16.1.6",
         "next-auth": "5.0.0-beta.30",
         "pg": "^8.20.0",
         "porto": "^0.2.37",
@@ -81,6 +81,13 @@
         "zod": "^3.25.76",
         "zustand": "^4.5.7"
     },
+    "pnpm": {
+        "overrides": {
+            "hono": ">=4.12.7",
+            "@hono/node-server": ">=1.19.10",
+            "lodash": ">=4.17.23"
+        }
+    },
     "devDependencies": {
         "@types/node": "^20.19.37",
         "@types/pg": "^8.18.0",
@@ -89,9 +96,9 @@
         "autoprefixer": "^10.4.27",
         "dotenv": "^17.3.1",
         "eslint": "^8.57.1",
-        "eslint-config-next": "14.1.0",
+        "eslint-config-next": "16.1.6",
         "postcss": "^8.5.8",
-        "prisma": "^7.4.2",
+        "prisma": "^7.5.0",
         "tailwindcss-animate": "^1.0.7",
         "tsx": "^4.21.0",
         "typescript": "^5.9.3"
