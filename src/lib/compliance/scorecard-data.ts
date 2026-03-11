@@ -54,7 +54,7 @@ export const SCORING_CRITERIA: ScoringCriteria[] = [
         id: "audit_trail",
         name: "Audit Trail & Reporting",
         description:
-            "Can the protocol produce transaction records, compliance reports, or SAR/STR filings for regulators?",
+            "Can the protocol produce transaction records, compliance reports, or SAR/STR filings for regulators? Human-in-the-loop review queue?",
         weight: 10,
     },
     {

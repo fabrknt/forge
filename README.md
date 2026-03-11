@@ -23,11 +23,11 @@ Forge plugs in all 5 Fabrknt products. Each integration lives in `src/lib/fabrkn
 
 | Product | SDK | Integration | What it does in Forge |
 |---------|-----|-------------|----------------------|
-| **Sentinel** | `@sentinel/core` | `sentinel.ts` | Guard validates transactions before execution. DCA/rebalance/grid pattern builders drive the Trade step. Jito tips provide MEV-protected execution. |
-| **Complr** | `@complr` | `compliance.ts` | Screens wallets during onboarding. Checks pools against regulatory lists before recommending. Generates compliance alerts for allocated positions. |
-| **Accredit** | `@accredit` | `identity.ts` | Verifies KYC level from on-chain PDAs. Gates features by verification tier. Blacklist screening before transactions. |
-| **Veil** | `@veil/crypto` | `privacy.ts` | Encrypts user allocation data at rest. Shamir secret sharing for M&A data room access. Private allocation sharing without revealing identity. |
-| **Stratum** | `@stratum/core` | `data.ts` | Merkle tree proofs for verifiable allocation history. Bitfield tracking for efficient pool state management. |
+| **Sentinel** | `@sentinel/core` | `sentinel.ts` | Guard validates transactions with 17 pattern detectors (8 Solana + 9 EVM). DCA/rebalance/grid pattern builders. Jito + Flashbots bundle management for MEV protection. |
+| **Complr** | `@complr` | `compliance.ts` | AI-powered screening (OFAC, TRM Labs, Chainalysis). Multi-jurisdiction checks (MAS/SFC/FSA). Confidence scoring. Human-in-the-loop review queue. |
+| **Accredit** | `@accredit` | `identity.ts` | On-chain KYC via Token-2022 transfer hooks. Multi-provider KYC (Civic, World ID). Sovereign identity verification. |
+| **Veil** | `@veil/core` | `privacy.ts` | NaCl Box encryption for allocation data. Shamir secret sharing for M-of-N access control. Noir ZK proofs for private sharing. |
+| **Stratum** | `@stratum/core` | `data.ts` | Merkle tree proofs for verifiable allocation history. Bitfield tracking for efficient pool state management. 800x state reduction. |
 
 ### Integration Architecture
 
@@ -39,7 +39,7 @@ User Request
     │       └── @complr: screen pools before recommending
     │
     ├── /api/fabrknt/guard
-    │       └── @sentinel: validate transaction security (8 patterns)
+    │       └── @sentinel: validate transaction security (17 patterns)
     │
     ├── /api/fabrknt/dca
     │       └── @sentinel: build DCA schedule for gradual entry
@@ -99,7 +99,7 @@ The rebalance detector (`src/lib/curate/rebalance-detector.ts`) combines Forge's
 | Endpoint | Method | SDK | Description |
 |----------|--------|-----|-------------|
 | `/api/fabrknt` | GET | — | Integration status dashboard |
-| `/api/fabrknt/guard` | POST | Sentinel | Validate transaction for 8 security patterns |
+| `/api/fabrknt/guard` | POST | Sentinel | Validate transaction for 17 security patterns |
 | `/api/fabrknt/dca` | POST | Sentinel | Build DCA execution schedule |
 | `/api/fabrknt/rebalance` | POST | Sentinel + Complr | Generate rebalance trades with compliance check |
 | `/api/fabrknt/tip` | GET | Sentinel | Jito tip account for MEV protection |
@@ -156,21 +156,21 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 | Product | What it does in Forge |
 |---------|----------------------|
-| **Complr** | Screens wallets and pools before recommending. SAR/STR generation. |
-| **Accredit** | Verifies KYC level. Gates features by verification tier. |
-| **Sentinel** | Guards transactions with pre-tx analysis. DCA/rebalance builders. |
+| **Complr** | AI-powered screening (OFAC, TRM Labs, Chainalysis). SAR/STR generation. Confidence scoring. |
+| **Accredit** | On-chain KYC via transfer hooks. Multi-provider verification (Civic, World ID). Sovereign identity. |
+| **Sentinel** | Guards transactions with 17-pattern detection. Simulation sandbox. DCA/rebalance/grid builders. Jito + Flashbots bundles. |
 
 ### Privacy
 
 | Product | What it does in Forge |
 |---------|----------------------|
-| **Veil** | Encrypts allocation data. ZK proofs for private sharing. |
+| **Veil** | NaCl encryption for allocation data. Shamir sharing for access control. Noir ZK proofs. |
 
 ### Data
 
 | Product | What it does in Forge |
 |---------|----------------------|
-| **Stratum** | Powers sanctions data and regulatory feeds. Merkle proofs for allocation history. |
+| **Stratum** | Merkle proofs for verifiable allocation history. Bitfield for pool state tracking. 800x state reduction. |
 
 All products live in [fabrknt/api](https://github.com/fabrknt/api).
 
