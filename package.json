@@ -82,19 +82,33 @@
         "wagmi": "^3.5.0",
         "zod": "^3.25.76",
         "zustand": "^4.5.7",
-        "@sentinel/core": "file:../../sentinel/packages/core",
-        "@veil/core": "file:../../veil/packages/core",
-        "@stratum/core": "file:../../stratum/packages/core",
-        "@accredit/core": "file:../../accredit/packages/core",
-        "@complr/core": "file:../../complr/packages/core"
+        "@sentinel/core": "git+https://github.com/psyto/sentinel.git#main&path:packages/core",
+        "@veil/core": "git+https://github.com/psyto/veil.git#main&path:packages/core",
+        "@stratum/core": "git+https://github.com/psyto/stratum.git#main&path:packages/core",
+        "@accredit/core": "git+https://github.com/psyto/accredit.git#master&path:packages/core",
+        "@complr/core": "git+https://github.com/psyto/complr.git#master&path:packages/core"
     },
     "pnpm": {
         "overrides": {
             "@types/pg": "^8.18.0",
             "hono": ">=4.12.7",
             "@hono/node-server": ">=1.19.10",
-            "lodash": ">=4.17.23"
-        }
+            "lodash": ">=4.17.23",
+            "@toruslabs/eccrypto": "^7.0.0",
+            "@toruslabs/metadata-helpers": "^8.2.0"
+        },
+        "onlyBuiltDependencies": [
+            "@prisma/engines",
+            "prisma",
+            "@veil/core",
+            "@sentinel/core",
+            "@stratum/core",
+            "@accredit/core",
+            "@complr/core",
+            "esbuild",
+            "puppeteer",
+            "sharp"
+        ]
     },
     "devDependencies": {
         "@types/node": "^20.19.37",
