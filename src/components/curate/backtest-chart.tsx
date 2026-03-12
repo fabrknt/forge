@@ -40,6 +40,57 @@ const COLORS = [
     "#ec4899", // pink
 ];
 
+// Format date for display
+function formatDate(dateStr: string) {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+// Format currency
+function formatValue(value: number) {
+    return `$${value.toLocaleString(undefined, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    })}`;
+}
+
+function CustomTooltip({
+    active,
+    payload,
+    label,
+    results,
+}: {
+    active?: boolean;
+    payload?: { color: string; name: string; value: number }[];
+    label?: string;
+    results: BacktestResult[];
+}) {
+    if (!active || !payload || !label) return null;
+
+    return (
+        <div className="bg-slate-800 border border-slate-700 rounded-lg p-3 shadow-lg">
+            <p className="text-slate-400 text-xs mb-2">{formatDate(label)}</p>
+            {payload.map((entry, index) => {
+                const result = results.find((r) => r.poolId === entry.name);
+                return (
+                    <div key={index} className="flex items-center gap-2 text-sm">
+                        <div
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: entry.color }}
+                        />
+                        <span className="text-slate-300 truncate max-w-[120px]">
+                            {result?.project || entry.name}
+                        </span>
+                        <span className="text-white font-medium ml-auto">
+                            {formatValue(entry.value)}
+                        </span>
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
+
 export function BacktestChart({ results, initialAmount }: BacktestChartProps) {
     if (results.length === 0) {
         return (
@@ -73,56 +124,6 @@ export function BacktestChart({ results, initialAmount }: BacktestChartProps) {
         mergedData.push(point);
     });
 
-    // Format date for display
-    const formatDate = (dateStr: string) => {
-        const date = new Date(dateStr);
-        return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-    };
-
-    // Format currency
-    const formatValue = (value: number) => {
-        return `$${value.toLocaleString(undefined, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        })}`;
-    };
-
-    // Custom tooltip
-    const CustomTooltip = ({
-        active,
-        payload,
-        label,
-    }: {
-        active?: boolean;
-        payload?: { color: string; name: string; value: number }[];
-        label?: string;
-    }) => {
-        if (!active || !payload || !label) return null;
-
-        return (
-            <div className="bg-slate-800 border border-slate-700 rounded-lg p-3 shadow-lg">
-                <p className="text-slate-400 text-xs mb-2">{formatDate(label)}</p>
-                {payload.map((entry, index) => {
-                    const result = results.find((r) => r.poolId === entry.name);
-                    return (
-                        <div key={index} className="flex items-center gap-2 text-sm">
-                            <div
-                                className="w-2 h-2 rounded-full"
-                                style={{ backgroundColor: entry.color }}
-                            />
-                            <span className="text-slate-300 truncate max-w-[120px]">
-                                {result?.project || entry.name}
-                            </span>
-                            <span className="text-white font-medium ml-auto">
-                                {formatValue(entry.value)}
-                            </span>
-                        </div>
-                    );
-                })}
-            </div>
-        );
-    };
-
     return (
         <ResponsiveContainer width="100%" height={280}>
             <LineChart data={mergedData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
@@ -141,7 +142,7 @@ export function BacktestChart({ results, initialAmount }: BacktestChartProps) {
                     tickLine={{ stroke: "#475569" }}
                     domain={["dataMin - 100", "dataMax + 100"]}
                 />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<CustomTooltip results={results} />} />
                 <Legend
                     formatter={(value) => {
                         const result = results.find((r) => r.poolId === value);

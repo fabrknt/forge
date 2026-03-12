@@ -7,7 +7,7 @@
         "prebuild": "prisma generate",
         "build": "next build",
         "start": "next start -p 3000",
-        "lint": "next lint",
+        "lint": "eslint .",
         "type-check": "tsc --noEmit",
         "fetch:company": "tsx scripts/fetch-company-data.ts",
         "fetch:init-targets": "tsx scripts/fetch-init-target-data.ts",
@@ -16,7 +16,9 @@
         "calculate:scores": "tsx scripts/calculate-scores.ts",
         "seed:demo": "tsx scripts/seed-demo-companies.ts",
         "fetch:defi": "tsx scripts/fetch-defi-relationships.ts",
-        "postinstall": "prisma generate"
+        "postinstall": "prisma generate",
+        "test": "vitest run",
+        "test:watch": "vitest"
     },
     "prisma": {
         "seed": "tsx prisma/seed.ts"
@@ -79,10 +81,16 @@
         "viem": "^2.47.1",
         "wagmi": "^3.5.0",
         "zod": "^3.25.76",
-        "zustand": "^4.5.7"
+        "zustand": "^4.5.7",
+        "@sentinel/core": "file:../../sentinel/packages/core",
+        "@veil/core": "file:../../veil/packages/core",
+        "@stratum/core": "file:../../stratum/packages/core",
+        "@accredit/core": "file:../../accredit/packages/core",
+        "@complr/core": "file:../../complr/packages/core"
     },
     "pnpm": {
         "overrides": {
+            "@types/pg": "^8.18.0",
             "hono": ">=4.12.7",
             "@hono/node-server": ">=1.19.10",
             "lodash": ">=4.17.23"
@@ -93,6 +101,7 @@
         "@types/pg": "^8.18.0",
         "@types/react": "^18.3.28",
         "@types/react-dom": "^18.3.7",
+        "@vitejs/plugin-react": "^5.1.4",
         "autoprefixer": "^10.4.27",
         "dotenv": "^17.3.1",
         "eslint": "^8.57.1",
@@ -101,6 +110,7 @@
         "prisma": "^7.5.0",
         "tailwindcss-animate": "^1.0.7",
         "tsx": "^4.21.0",
-        "typescript": "^5.9.3"
+        "typescript": "^5.9.3",
+        "vitest": "^4.0.18"
     }
 }

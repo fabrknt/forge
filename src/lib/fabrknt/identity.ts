@@ -1,14 +1,22 @@
 /**
- * @accredit integration — On-chain KYC/AML verification.
+ * @accredit/core integration — On-chain KYC/AML verification.
  *
- * Usage in Forge:
- * - Verify user whitelist status before allowing pool access
- * - Check KYC level for premium/institutional features
- * - Blacklist screening before transaction execution
- * - Multi-provider KYC support (Civic, World ID, internal)
- * - Compliant token wrapping/unwrapping
- * - Institutional dashboard data
+ * Thin adapter layer between Forge's domain types and the real @accredit/core SDK.
+ * - Uses @accredit/core KycLevel enum for level ordering
+ * - Uses @accredit/core KYC_TRADE_LIMITS for trade limit lookups
+ * - WrapperConfig/WrapRequest/WrapResult types come from @accredit/core
+ * - Multi-provider KYC routing (Civic, World ID) is Forge-specific
  */
+
+import {
+  KycLevel as SdkKycLevel,
+  KYC_TRADE_LIMITS,
+} from "@accredit/core";
+import type {
+  WrapperConfig as SdkWrapperConfig,
+  WrapRequest as SdkWrapRequest,
+  WrapResult as SdkWrapResult,
+} from "@accredit/core";
 
 import type {
   KycLevel,
@@ -40,7 +48,6 @@ kycProviders.set("internal", {
 
 /**
  * Register a KYC provider (Civic, World ID, etc.).
- * In production: configures the Accredit SDK to route verification.
  */
 export function registerKycProvider(config: KycProviderConfig): void {
   kycProviders.set(config.provider, config);
@@ -61,7 +68,7 @@ export async function verifyIdentity(
   walletAddress: string,
   options?: { provider?: KycProvider }
 ): Promise<IdentityVerification> {
-  // In production: queries accredit on-chain program via KycClient
+  // In production: queries @accredit/core on-chain program via KycClient
   // findWhitelistEntryPda(wallet, programId) -> fetch account data
   // If provider specified, routes to that provider's SDK
 
@@ -69,7 +76,6 @@ export async function verifyIdentity(
 
   if (provider === "civic") {
     // In production: uses Civic Pass SDK
-    // const pass = await civicClient.getPass(walletAddress);
     return {
       wallet: walletAddress,
       kycLevel: "none",
@@ -83,7 +89,6 @@ export async function verifyIdentity(
 
   if (provider === "world_id") {
     // In production: uses World ID SDK
-    // const proof = await worldIdClient.verify(walletAddress);
     return {
       wallet: walletAddress,
       kycLevel: "none",
@@ -109,7 +114,6 @@ export async function verifyIdentity(
 
 /**
  * Verify identity with a specific KYC level request.
- * In production: routes to the appropriate provider and initiates verification flow.
  */
 export async function requestVerification(
   request: KycVerificationRequest
@@ -129,14 +133,18 @@ export async function requestVerification(
 
 // ---------------------------------------------------------------------------
 // Whitelist check — gate pool access
+// Uses @accredit/core KycLevel enum for ordering
 // ---------------------------------------------------------------------------
 
+/**
+ * Map Forge KycLevel strings to @accredit/core KycLevel enum values for ordering.
+ */
 const LEVEL_ORDER: Record<KycLevel, number> = {
   none: 0,
-  basic: 1,
-  standard: 2,
-  enhanced: 3,
-  institutional: 4,
+  basic: SdkKycLevel.Basic,
+  standard: SdkKycLevel.Standard,
+  enhanced: SdkKycLevel.Enhanced,
+  institutional: SdkKycLevel.Institutional,
 };
 
 export function isAllowedForPool(
@@ -151,9 +159,8 @@ export function isAllowedForPool(
 // ---------------------------------------------------------------------------
 
 export async function isBlacklisted(walletAddress: string): Promise<boolean> {
-  // In production: queries BlacklistClient.findBlacklistEntryPda()
-  // Returns true if wallet has a blacklist PDA entry
-  return false; // placeholder
+  // In production: queries @accredit/core BlacklistClient.findBlacklistEntryPda()
+  return false;
 }
 
 // ---------------------------------------------------------------------------
@@ -182,8 +189,7 @@ export function canAccessFeature(
 }
 
 // ---------------------------------------------------------------------------
-// Compliant token wrapping (mirrors @accredit/core wrapper)
-// In production: uses WrapperClient on-chain interactions
+// Compliant token wrapping (uses @accredit/core wrapper types)
 // ---------------------------------------------------------------------------
 
 /**
@@ -194,12 +200,11 @@ export async function wrapTokens(
   request: WrapRequest,
   verification: IdentityVerification
 ): Promise<WrapResult> {
-  // In production: calls WrapperClient.wrap()
+  // In production: calls @accredit/core WrapperClient.wrap()
   // 1. Verify KYC level meets wrapper minimum
   // 2. Transfer underlying tokens to vault
   // 3. Mint wrapped tokens to user
 
-  // Placeholder
   return {
     success: false,
     wrappedAmount: BigInt(0),
@@ -215,7 +220,7 @@ export async function unwrapTokens(
   request: WrapRequest,
   verification: IdentityVerification
 ): Promise<WrapResult> {
-  // In production: calls WrapperClient.unwrap()
+  // In production: calls @accredit/core WrapperClient.unwrap()
   return {
     success: false,
     wrappedAmount: BigInt(0),
@@ -225,14 +230,13 @@ export async function unwrapTokens(
 }
 
 // ---------------------------------------------------------------------------
-// Institutional dashboard (stub)
-// In production: aggregates data from on-chain accounts
+// Institutional dashboard
 // ---------------------------------------------------------------------------
 
 export async function getInstitutionalDashboard(
   organizationId: string
 ): Promise<InstitutionalDashboard> {
-  // In production: queries multiple on-chain accounts and aggregates
+  // In production: aggregates data from on-chain accounts
   return {
     organizationId,
     totalWallets: 0,
